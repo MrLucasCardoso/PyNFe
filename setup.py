@@ -6,7 +6,7 @@ def parse(filename):
     lineiter = (line.strip() for line in open(filename))
     return [line for line in lineiter if line and not line.startswith("#")]
 
-requirements = lambda f: [str(i.req) for i in parse(f, session=False)]
+requirements = lambda f: [str(i.req) for i in parse(f)]
 
 setup(
     name='PyNFe',
