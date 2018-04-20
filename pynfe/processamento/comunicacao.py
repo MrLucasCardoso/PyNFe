@@ -428,6 +428,7 @@ class ComunicacaoSefaz(Comunicacao):
         # Estados que utilizam outros ambientes
         else:
             lista_svrs = ['AC', 'RN', 'PB', 'SC', 'SE', 'PI']
+            lista_svan = ['MA','PA']
             if self.uf.upper() in lista_svrs:
                 if self._ambiente == 1:
                     ambiente = 'HTTPS'
@@ -439,6 +440,19 @@ class ComunicacaoSefaz(Comunicacao):
                 elif modelo == 'nfce':
                     # nfce Ex: https://homologacao.nfce.fazenda.pr.gov.br/nfce/NFeStatusServico3
                     self.url = NFCE['SVRS'][ambiente] + NFCE['SVRS'][consulta]
+                else:
+                    raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce"')
+            elif self.uf.upper() in lista_svan:
+                if self._ambiente == 1:
+                    ambiente = 'HTTPS'
+                else:
+                    ambiente = 'HOMOLOGACAO'
+                if modelo == 'nfe':
+                    # nfe Ex: https://nfe.fazenda.pr.gov.br/nfe/NFeStatusServico3
+                    self.url = NFE['SVAN'][ambiente] + NFE['SVAN'][consulta]
+                elif modelo == 'nfce':
+                    # nfce Ex: https://homologacao.nfce.fazenda.pr.gov.br/nfce/NFeStatusServico3
+                    self.url = NFCE['SVAN'][ambiente] + NFCE['SVAN'][consulta]
                 else:
                     raise Exception('Modelo não encontrado! Defina modelo="nfe" ou "nfce"')
         return self.url
@@ -535,9 +549,6 @@ class ComunicacaoSefaz(Comunicacao):
                 etree.tostring(xml, encoding='unicode').replace('\n', '')
             )
             xml = xml_declaration + xml
-            # debug dev 4.00
-            print(xml)
-            print(url)
             # Faz o request com o servidor
             result = requests.post(url, xml, headers=self._post_header(), cert=chave_cert, verify=False)
             result.encoding = 'utf-8'
